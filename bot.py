@@ -31,7 +31,6 @@ DICE_MAX = 20
 COLOR_ROLE_TOP_ID = 1415779488528203799
 COLOR_ROLE_BOTTOM_ID = 1415779353345658971
 ROLL_COUNT = 8
-# ~8 edits/sec stays under Discord's ~10 edits/sec guideline and avoids 429s.
 EDIT_INTERVAL_S = 0.2
 USER_COOLDOWN_S = 5.0
 
@@ -40,98 +39,45 @@ EMBED_COLOR = discord.Color.from_rgb(88, 101, 242)  # Discord blurple
 EMBED_TITLE = "🎲 Кубик судьбы"
 
 VIP_IDS = frozenset({743045383764049962, 1217457275225112626})
-VIP_CUSTOM: dict[int, tuple[int, tuple[str, ...]]] = {
-    # 50% (Примарх)
-    1270988863661146112: (50, (
-        "Вы — верный клинок в руках Императоров. Вы Примарх и на 50% {action}! ⚔️",
-        "Императоры увидели в тебе своего сына... Рады тебя видеть, Примарх. Вы на 50% {action}.",
-    )),
-    1267060866554003577: (50, (
-        "Вы — верный клинок в руках Императоров. Вы Примарх и на 50% {action}! ⚔️",
-        "Императоры увидели в тебе своего сына... Рады тебя видеть, Примарх. Вы на 50% {action}.",
-    )),
-    1527223954677436529: (50, (
-        "Вы — верный клинок в руках Императоров. Вы Примарх и на 50% {action}! ⚔️",
-        "Императоры увидели в тебе своего сына... Рады тебя видеть, Примарх. Вы на 50% {action}.",
-    )),
-    # 25% (Ангел)
-    1247639212073812063: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    706168663329210449: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    1513269139194773504: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    604944158142103587: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    632893088146260005: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    825639032074928128: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    1410260842708074507: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    825340887596007464: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    838294142072651796: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    1346116223749980181: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    790325676468076574: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    507502716155854848: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    1067644373036175400: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    1093596791716450354: (25, (
-        "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
-        "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
-    )),
-    # 75% (Архангел)
-    533690155932844032: (75, (
-        "Вы почти Импераподобны, Архангел. Императоры довольны вами. Вы на 75% {action}! 👑",
-        "Вы — самый верный слуга Императоров, Архангел. Вы на 75% {action}.",
-    )),
-    981370062663483433: (75, (
-        "Вы почти Импераподобны, Архангел. Императоры довольны вами. Вы на 75% {action}! 👑",
-        "Вы — самый верный слуга Императоров, Архангел. Вы на 75% {action}.",
-    )),
-    740904136895102999: (75, (
-        "Вы почти Импераподобны, Архангел. Императоры довольны вами. Вы на 75% {action}! 👑",
-        "Вы — самый верный слуга Императоров, Архангел. Вы на 75% {action}.",
-    )),
-    1247210866387062835: (75, (
-        "Вы почти Импераподобны, Архангел. Императоры довольны вами. Вы на 75% {action}! 👑",
-        "Вы — самый верный слуга Императоров, Архангел. Вы на 75% {action}.",
-    )),
-        974999269004148746: (69, (
-        "Ваши помыслы туманны, но Императорам это нравится. Вы на 69% {action}.",
-    )),
-}
+VIP_25_IDS = frozenset({
+    1247639212073812063, 706168663329210449, 1513269139194773504,
+    604944158142103587, 632893088146260005, 825639032074928128,
+    1410260842708074507, 825340887596007464, 838294142072651796,
+    1346116223749980181, 790325676468076574, 507502716155854848,
+    1067644373036175400, 1093596791716450354,
+})
+
+VIP_50_IDS = frozenset({
+    1270988863661146112, 1267060866554003577, 1527223954677436529,
+})
+
+VIP_69_IDS = frozenset({
+    974999269004148746,
+})
+
+VIP_75_IDS = frozenset({
+    533690155932844032, 981370062663483433, 740904136895102999,
+    1247210866387062835,
+})
+
+TEXT_25 = (
+    "За вашей спиной расправились белые крылья. Вы Ангел и на 25% {action}! 🕊️",
+    "Императоры узрели в вас искру истинного света. Вы Ангел и на 25% {action}!",
+)
+
+TEXT_50 = (
+    "Вы — верный клинок в руках Императоров. Вы Примарх и на 50% {action}! ⚔️",
+    "Императоры увидели в тебе своего сына... Рады тебя видеть, Примарх. Вы на 50% {action}.",
+)
+
+TEXT_69 = (
+    "Ваши помыслы туманны, но Императорам это нравится. Вы на 69% {action}.",
+)
+
+TEXT_75 = (
+    "Вы почти Импераподобны, Архангел. Императоры довольны вами. Вы на 75% {action}! 👑",
+    "Вы — самый верный слуга Императоров, Архангел. Вы на 75% {action}.",
+)
 EMPEROR_WORD = "император"
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -254,32 +200,40 @@ def pick_percent_phrase(percent: int, action: str) -> str:
             return template.format(percent=percent, action=action)
     return f"Вы на {percent}% {action}."
 
-
 def resolve_percent_result(user_id: int, raw_action: str) -> tuple[int, str]:
     """Return (percent, embed description) for the /percent command."""
     action = lowercase_first(raw_action)
     emperor = mentions_emperor(raw_action)
 
-    if emperor and user_id in VIP_IDS:
+    if not emperor:
+        percent = random.randint(0, 100)
+        flavor = pick_percent_phrase(percent, action)
+        heading = f"## Вы на {percent}% {action}!"
+        return percent, f"{flavor}\n\n{heading}"
+
+    if user_id in VIP_IDS:
         percent = 100
         text = f"Император посмотрел в зеркало. Вы на 100% {action}! 👑"
         return percent, f"## {text}"
 
-    if emperor and user_id in VIP_CUSTOM:
-        percent, templates = VIP_CUSTOM[user_id]
+    percent = 0
+    templates = None
+
+    if user_id in VIP_25_IDS:
+        percent, templates = 25, TEXT_25
+    elif user_id in VIP_50_IDS:
+        percent, templates = 50, TEXT_50
+    elif user_id in VIP_69_IDS:
+        percent, templates = 69, TEXT_69
+    elif user_id in VIP_75_IDS:
+        percent, templates = 75, TEXT_75
+
+    if templates:
         text = random.choice(templates).format(action=action)
         return percent, f"## {text}"
 
-    if emperor:
-        percent = 0
-        text = f"Смертный, не смей равнять себя с Императорами. Вы на 0% {action}."
-        return percent, f"## {text}"
-
-    percent = random.randint(0, 100)
-    flavor = pick_percent_phrase(percent, action)
-    heading = f"## Вы на {percent}% {action}!"
-    return percent, f"{flavor}\n\n{heading}"
-
+    text = f"Смертный, не смей равнять себя с Императорами. Вы на 0% {action}."
+    return 0, f"## {text}"
 
 def load_json_file(path: Path, default: Any) -> Any:
     """Read UTF-8 JSON; return default if missing or corrupted."""
@@ -340,14 +294,11 @@ def load_rewards() -> list[dict[str, int]]:
             continue
     return rewards
 
-
-def find_reward_for_channel(
+def find_rewards_for_channel(
     rewards: list[dict[str, int]], channel_id: int
-) -> dict[str, int] | None:
-    for reward in rewards:
-        if reward["channel_id"] == channel_id:
-            return reward
-    return None
+) -> list[dict[str, int]]:
+    """Возвращает список ВСЕХ наград для указанного канала."""
+    return [reward for reward in rewards if reward["channel_id"] == channel_id]
 
 class ColorRoleCleanupView(discord.ui.View):
     def __init__(self) -> None:
@@ -454,8 +405,9 @@ async def on_message(message: discord.Message) -> None:
 
         async with DATA_LOCK:
             rewards = load_rewards()
-            reward = find_reward_for_channel(rewards, message.channel.id)
-            if reward is None:
+            # Получаем СПИСОК всех наград для этого канала
+            channel_rewards = find_rewards_for_channel(rewards, message.channel.id)
+            if not channel_rewards:
                 return
 
             counts = load_counts()
@@ -464,33 +416,32 @@ async def on_message(message: discord.Message) -> None:
             counts[user_key] = new_count
             save_json_file(COUNTS_FILE, counts)
 
-        if new_count != reward["required_messages"]:
-            return
+        # Проходимся по каждой награде в списке
+        for reward in channel_rewards:
+            if new_count != reward["required_messages"]:
+                continue # Если количество не совпадает с этой наградой, пропускаем и проверяем следующую
 
-        role = message.guild.get_role(reward["role_id"])
-        if role is None:
-            log.warning(
-                "Reward role %s not found in guild %s",
-                reward["role_id"],
-                message.guild.id,
-            )
-            return
-        if not isinstance(message.author, discord.Member):
-            return
-        if role in message.author.roles:
-            return
+            role = message.guild.get_role(reward["role_id"])
+            if role is None:
+                log.warning(
+                    "Reward role %s not found in guild %s",
+                    reward["role_id"],
+                    message.guild.id,
+                )
+                continue # Если роли нет, идем к следующей награде
+                
+            if not isinstance(message.author, discord.Member):
+                continue
+                
+            if role in message.author.roles:
+                continue # Если роль уже есть, идем к следующей
 
-        try:
-            await message.author.add_roles(
-                role, reason=f"Награда за {new_count} сообщений"
-            )
-        except discord.HTTPException as exc:
-            log.warning("Failed to add reward role %s: %s", role.id, exc)
-            return
-
-
-        except discord.HTTPException as exc:
-            log.warning("Failed to send reward congratulations: %s", exc)
+            try:
+                await message.author.add_roles(
+                    role, reason=f"Награда за {new_count} сообщений"
+                )
+            except discord.HTTPException as exc:
+                log.warning("Failed to add reward role %s: %s", role.id, exc)
     finally:
         await bot.process_commands(message)
 
@@ -769,7 +720,7 @@ async def count_history(
         )
         return
 
-    if find_reward_for_channel(rewards, channel.id) is None:
+    if not find_rewards_for_channel(rewards, channel.id):
         await interaction.response.send_message(
             f"Канал {channel.mention} не в списке отслеживания.",
             ephemeral=True,
