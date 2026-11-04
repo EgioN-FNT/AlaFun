@@ -1,7 +1,5 @@
-"""Discord bot with global /d20 and /percent slash commands."""
-
 from __future__ import annotations
-
+#
 import asyncio
 import json
 import logging
@@ -397,15 +395,14 @@ async def on_ready() -> None:
 
 @bot.event
 async def on_message(message: discord.Message) -> None:
-    try:
-        if message.author.bot:
-            return
-        if message.guild is None:
-            return
+    # 1. Выносим проверки НАВЕРХ, до try.
+    # Теперь, если это бот или ЛС, мы выходим и вообще не трогаем finally.
+    if message.author.bot or message.guild is None:
+        return
 
+    try:
         async with DATA_LOCK:
             rewards = load_rewards()
-            # Получаем СПИСОК всех наград для этого канала
             channel_rewards = find_rewards_for_channel(rewards, message.channel.id)
             if not channel_rewards:
                 return
@@ -416,10 +413,9 @@ async def on_message(message: discord.Message) -> None:
             counts[user_key] = new_count
             save_json_file(COUNTS_FILE, counts)
 
-        # Проходимся по каждой награде в списке
         for reward in channel_rewards:
             if new_count != reward["required_messages"]:
-                continue # Если количество не совпадает с этой наградой, пропускаем и проверяем следующую
+                continue
 
             role = message.guild.get_role(reward["role_id"])
             if role is None:
@@ -428,20 +424,27 @@ async def on_message(message: discord.Message) -> None:
                     reward["role_id"],
                     message.guild.id,
                 )
-                continue # Если роли нет, идем к следующей награде
-                
+                continue
+
             if not isinstance(message.author, discord.Member):
                 continue
-                
+
             if role in message.author.roles:
-                continue # Если роль уже есть, идем к следующей
+                continue
 
             try:
                 await message.author.add_roles(
                     role, reason=f"Награда за {new_count} сообщений"
                 )
+            except discord.Forbidden as exc:
+                log.warning(
+                    "Нет прав выдать роль %s пользователю %s: %s",
+                    role.id,
+                    message.author.id,
+                    exc,
+                )
             except discord.HTTPException as exc:
-                log.warning("Failed to add reward role %s: %s", role.id, exc)
+                log.warning("Не удалось выдать роль %s: %s", role.id, exc)
     finally:
         await bot.process_commands(message)
 
@@ -568,6 +571,7 @@ async def reward_add(
     role: discord.Role,
     messages: int,
 ) -> None:
+  
     if messages < 1:
         await interaction.response.send_message(
             "Число сообщений должно быть не меньше 1.",
@@ -575,15 +579,17 @@ async def reward_add(
         )
         return
 
+  
     async with DATA_LOCK:
         rewards = load_rewards()
         overwritten = False
         for item in rewards:
-            if item["channel_id"] == channel.id:
-                item["role_id"] = role.id
+            
+            if item["channel_id"] == channel.id and item["role_id"] == role.id:
                 item["required_messages"] = messages
                 overwritten = True
                 break
+
         if not overwritten:
             rewards.append(
                 {
@@ -592,6 +598,7 @@ async def reward_add(
                     "required_messages": messages,
                 }
             )
+
         saved = save_json_file(REWARDS_FILE, rewards)
 
     if not saved:
@@ -607,7 +614,6 @@ async def reward_add(
         f"сообщений: **{messages}**.",
         ephemeral=True,
     )
-
 
 @bot.tree.command(name="reward_list", description="Показать все награды за сообщения")
 @app_commands.default_permissions(administrator=True)
@@ -636,23 +642,38 @@ async def reward_list(interaction: discord.Interaction) -> None:
 
     await interaction.response.send_message("\n".join(lines), ephemeral=True)
 
-
 @bot.tree.command(name="reward_remove", description="Удалить награду за сообщения в канале")
-@app_commands.describe(channel="Канал, настройку которого нужно удалить")
+@app_commands.describe(
+    channel="Канал, настройку которого нужно удалить",
+    role="Роль (если не указана — удалятся ВСЕ награды этого канала)",
+)
 @app_commands.default_permissions(administrator=True)
 async def reward_remove(
     interaction: discord.Interaction,
     channel: discord.TextChannel,
+    role: discord.Role | None = None,
 ) -> None:
     async with DATA_LOCK:
         rewards = load_rewards()
-        remaining = [item for item in rewards if item["channel_id"] != channel.id]
+
+        # 1. Если роль указана — фильтруем по паре (канал, роль)
+        #    Если нет — по одному каналу (удаляем всё, что в нём есть)
+        if role is None:
+            remaining = [item for item in rewards if item["channel_id"] != channel.id]
+        else:
+            remaining = [
+                item for item in rewards
+                if not (item["channel_id"] == channel.id and item["role_id"] == role.id)
+            ]
+
+        # 2. Если ничего не удалилось — сообщаем
         if len(remaining) == len(rewards):
             await interaction.response.send_message(
-                f"Для канала {channel.mention} награда не найдена.",
+                "Награда не найдена.",
                 ephemeral=True,
             )
             return
+
         saved = save_json_file(REWARDS_FILE, remaining)
 
     if not saved:
@@ -662,11 +683,17 @@ async def reward_remove(
         )
         return
 
-    await interaction.response.send_message(
-        f"Награда для канала {channel.mention} удалена.",
-        ephemeral=True,
-    )
-
+    # 3. Красиво описываем, что произошло
+    if role is None:
+        await interaction.response.send_message(
+            f"Все награды канала {channel.mention} удалены.",
+            ephemeral=True,
+        )
+    else:
+        await interaction.response.send_message(
+            f"Награда для канала {channel.mention} и роли {role.mention} удалена.",
+            ephemeral=True,
+        )
 
 @bot.tree.command(name="count_stats", description="Статистика сообщений в отслеживаемых каналах")
 @app_commands.describe(user="Участник (если не указан — сумма по всем)")
