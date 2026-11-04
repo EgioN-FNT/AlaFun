@@ -78,9 +78,13 @@ TEXT_75 = (
 )
 EMPEROR_WORD = "император"
 
-BASE_DIR = Path(__file__).resolve().parent
-COUNTS_FILE = BASE_DIR / "counts.json"
-REWARDS_FILE = BASE_DIR / "rewards.json"
+import os
+
+DATA_DIR = Path(os.environ.get("DATA_DIR", "/app/data"))
+DATA_DIR.mkdir(parents=True, exist_ok=True) # Создаем папку, если её нет
+
+COUNTS_FILE = DATA_DIR / "counts.json"
+REWARDS_FILE = DATA_DIR / "rewards.json"
 DATA_LOCK = asyncio.Lock()
 HISTORY_SCAN_MAX = 5000
 HISTORY_SCAN_DEFAULT = 1000
